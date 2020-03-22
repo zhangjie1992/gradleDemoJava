@@ -1,0 +1,57 @@
+//另外我们在setting.gradle中加入一个打印输出
+println "初始化阶段:开始------------------------------------"
+rootProject.name = 'todo'
+
+include 'todoChild'
+
+gradle.beforeProject {
+    println "配置阶段:开始------------------------------------${it}"
+}
+
+
+gradle.afterProject {
+    println "配置阶段:结束------------------------------------${it}"
+}
+
+gradle.buildFinished {
+    println "gradle执行:结束------------------------------------${it}"
+}
+
+
+gradle.taskGraph.whenReady {
+    println "配置阶段:全部完毕，任务执行图：${it}"
+
+    it.allTasks.eachWithIndex { Task entry, int i ->
+
+        println "任务执行图 遍历：${entry.getName()}"
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+if(TEST_PROPERTIES.toBoolean()){
+    println G_NAME
+
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("${rootDir}/test.properties"))
+    println properties.getProperty("P_NAME")
+}
+
+
+
+
+
+
+
+println "初始化阶段:结束------------------------------------"

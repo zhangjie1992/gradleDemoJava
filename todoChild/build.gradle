@@ -1,0 +1,130 @@
+plugins {
+    id 'java'
+}
+
+group 'com.jaxonz'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+
+
+
+
+
+
+
+
+
+
+//任务
+task copy(type: Copy, group: 'mytask') {
+    if (LOG_ENABLE.toBoolean()){
+        println "config: task  :${getName()}"
+    }
+
+    from 'src'
+    into 'disChild'
+
+    doFirst {
+        println "copy : ${project.getName()}"
+    }
+}
+
+task pTask(group: 'mytask') {
+    doFirst {
+        println "pTask  projectName: ${project.getName()}   projectDir: ${projectDir}"
+
+        //不管有没指定:todoChild都是在根目录下
+        def file = new File("tt")
+        if (!file.exists()) {
+            file.mkdirs()
+        }
+    }
+}
+
+
+
+
+
+def createDir = {
+    def file = new File(it)
+    if (!file.exists()) {
+        file.mkdirs()
+    }
+}
+
+task initDir(group: 'mytask') {
+    println "config: task  :${getName()}"
+
+    //task执行图1
+//    dependsOn 'pTask'
+
+    def paths = ['build/main/java', 'build/main/resources']
+    paths << 'build/main/test'
+
+    doFirst {
+        paths.each createDir
+    }
+    onlyIf {
+        true
+    }
+}
+
+initDir.configure {
+    //task执行图2
+//    dependsOn 'pTask'
+
+
+}
+
+initDir{
+    //task执行图3，还有好几种
+//    dependsOn 'pTask'
+
+    shouldRunAfter{
+        'childOnly'
+    }
+//    mustRunAfter('childOnly')
+}
+
+
+task childOnly(group: 'mytask') {
+    doFirst {
+        println 'childOnly doFirst'
+    }
+}
+
+
+
+
+
+
+
+//属性
+
+if (TEST_PROPERTIES.toBoolean()) {
+    println ext_rootP_1
+
+    println ext_allP_1
+}
+
+
+
+
+
+
+
+
+
+
+
+

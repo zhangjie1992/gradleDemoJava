@@ -1,0 +1,109 @@
+plugins {
+    id 'java'
+}
+
+group 'com.jaxonz'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+
+//依赖
+repositories {
+    //仓库
+    mavenLocal()
+    jcenter()
+}
+
+dependencies {
+    if (TEST_DEPENDENCIES.toBoolean()){
+        compile ('org.hibernate:hibernate-core:3.6.3.Final'){
+            //依赖冲突解决方式一，移除依赖中的传递性依赖（冲突的）
+            exclude group: 'org.slf4j',module:'slf4j-api'
+        }
+        compile 'ch.qos.logback:logback-classic:1.2.1'
+    }
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+configurations.all {
+    resolutionStrategy {
+        if (TEST_DEPENDENCIES.toBoolean()) {
+            //禁用Gradle默认依赖冲突解决策略
+            failOnVersionConflict()
+            //依赖冲突解决方式二，强制指定一个版本
+            force 'org.slf4j:slf4j-api:1.7.24'
+        }
+    }
+
+}
+
+
+
+
+
+//api
+getSubprojects().eachWithIndex { Project entry, int i ->
+
+}
+
+subprojects {
+
+}
+
+project('todoChild'){
+    it.beforeEvaluate {
+        println '------------'
+    }
+    println "我是 ${it.getName()}"
+}
+
+
+//监听
+project.afterEvaluate {
+    println '配置阶段:结束 rootProject------------------------------------'
+}
+
+
+//任务
+task copy(type: Copy, group: 'mytask') {
+    if (LOG_ENABLE.toBoolean()){
+        println "config: task  :${getName()}"
+    }
+
+    from 'src'
+    into 'dis'
+
+    doFirst {
+        println "copy : ${project.getName()}"
+    }
+}
+
+
+task pTask(group: 'mytask') {
+    doFirst {
+        println "pTask  projectName: ${project.getName()}   projectDir: ${projectDir}"
+
+    }
+}
+
+
+
+//属性
+if (TEST_PROPERTIES.toBoolean()) {
+    ext {
+        ext_rootP_1 = 'ext_rootP_1'
+    }
+
+
+    println ext_rootP_1
+
+
+    allprojects {
+        ext {
+            ext_allP_1 = 'ext_allP_1'
+        }
+    }
+    println ext_allP_1
+}
